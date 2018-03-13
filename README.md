@@ -2,7 +2,9 @@
 
 **SBD-iPALM** is a MATLAB package for *sparse blind deconvolution* (SBD) using the iPALM method, motivated by studies in blind deconvolution as a nonconvex optimization problem, and by applications in Scanning Tunneling Microscopy (STM).
 
-The [iPALM method](https://arxiv.org/abs/1702.02505) is an accelerated first-order method with optimal convergence guarantees to a stationary point when solving nonconvex optimization problems.
+The [iPALM method](https://arxiv.org/abs/1702.02505) is an accelerated first-order method with optimal convergence guarantees to a stationary point when solving nonconvex optimization problems. We combine this with the [l1-reweighting method](https://arxiv.org/abs/0711.1612) to produce sparse, robust and interpretable activation maps.
+
+Please contact [yl3027@columbia.edu](yl3027@columbia.edu) for any requests / feedback. We thank Sky Chueng and Abhay Pasupathy for the simulated kernel data `Data_N_50_nDef_1_thop_-0.200.mat` used in `genconvdata.m` and `example.m`.
 
 
 ## Updates for v2
