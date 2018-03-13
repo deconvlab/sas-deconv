@@ -1,6 +1,17 @@
 function iterator = mksbd(Y, p, lambda, xpos, getbias)
 %MKSBD  Make an iterator for solving SBD
-
+%  Creates an iPALM iterator for solving SBD by supplying a smooth
+%  square-error term H, the nonsmooth Huber terms and the corresponding
+%  descent (gradient / prox quantities).
+%
+%  iterator = mkcdl(Y, p, lambda, xpos, getbias)
+%    returns the iterator. Provide as input arguments:
+%       Y:  [ARRAY DOUBLE].  A cell array containing the observation.
+%       p:  [2 INT].  The size of the recovered kernel.
+%       lambda:  [DOUBLE >0].  The sparsity tradeoff parameter.
+%       xpos:  bool.  Set to TRUE to ensure X is nonnegative.
+%       getbias: bool.  Set to TRUE to estimate a constant bias for Y.
+%
 
 % Cost function + some defs
 m = size(Y);  ob = obops;  

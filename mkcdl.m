@@ -1,5 +1,24 @@
 function [iterator, synthesize] = mkcdl(Y, p, K, lambda, xpos, getbias)
-%MKSBD  Make an iterator for solving CDL
+%MKCDL  Make an iterator for solving CDL
+%  Creates an iPALM iterator for solving CDL by supplying a smooth
+%  square-error term H, the nonsmooth Huber terms and the corresponding
+%  descent (gradient / prox quantities).
+%
+%  [iterator, synthesize] = mkcdl(Y, p, K, lambda, xpos, getbias)
+%    returns the iterator and a function for synthesizing a reconstruction
+%    of the data using cell arrays A and X in the form
+%           A:[1xK CELL],  X:[KxN CELL]
+%    where K is the number of kernels and N is the number of samples in Y.
+%
+%    Provide as input arguments:
+%       Y:  [1xN CELL].  A cell array containing the observation samples.
+%       p:  [2 INT].  The size of the recovered kernel.
+%       K:  [INT].  The number of kernels to recover.
+%       lambda:  [DOUBLE >0].  The sparsity tradeoff parameter.
+%       xpos:  bool.  Set to TRUE to ensure X is nonnegative.
+%       getbias: bool.  Set to TRUE to estimate a constant bias in each Y.
+%
+
 
 % Cost function + some defs
 N = numel(Y);
