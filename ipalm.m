@@ -10,30 +10,67 @@ classdef ipalm < matlab.mixin.SetGet & matlab.mixin.Copyable
 %   deconvolution, analysis dictionary learning, and so forth:
 %       e.g.    Y = A o X + b,      X = A'o Y + b.
 %
+%
 %   The structure of the iterator stays true enough to this bilinear model
 %   to keep its implementation simple whilst offering enough generality for
 %   extensions. Just provide/adjust its various properties,
 %
-%     NONSEPERABLE TERM  H:  struct/object. 
-%       Provide the following fields,
+%     VARIABLES  A, X, b:  cell array of arrays for each variable. 
+%       Each cell element contains a dictionary / combination map / bias 
+%       -- e.g. in an array. The cell array structure between A and X
+%       should follow the convention
+%               A:[1xK CELL],  X:[KxN CELL],
+%       where K is the number of atoms and N is the number of samples.
 %
-%     SEPERABLE TERMS  f:  cell array of structs/objects. 
+%       The number of cells in b is not restricted.
+%
+%
+%     NONSEPERABLE TERM  H:  struct/object. 
+%     Provide the following fields,
+%
+%         value:  function handle.
+%           A function handle of the form
+%               @ (A, X, b, cache) [DOUBLE > 0]
+%           that evaluates H for some fixed (A, X, b). 
+%
+%         gradA, gradX, gradb:  cell arrays of function handles.
+%           Each grad array should have the same size as the corresponding
+%           variable, i.e. size(gradA) == size(A), vice versa. 
+%
+%           Each cell element is a function handle of the form
+%               @ (A, X, b, cache) [ARRAY DOUBLE]
+%           that the appropriate gradient for some fixed (A, X, b). This
+%           comes of with some size restrictions, e.g.
+%               size(H.gradX{i,j}(A, X, b, cache)) == size(X{i,j})
+%
+%
+%     SEPERABLE TERMS  f:  cell array of structs/objects for each X. 
 %       Must have the same number of elements as X (see below). Each cell 
 %       element is a struct/object with the fields
 %
-%     VARIABLES  A, X, b:  cell array. 
-%       Each cell element contains a dictionary / combination map / bias 
-%       -- e.g. in an array. A and X must have the same number of cells 
-%       (since they interact in pairs). The number of cells in b is not 
-%       restricted since depends on the data.
+%         value:  function handle.
+%           A function handle of the form
+%               @ (Xi) [DOUBLE]
+%           that evaluates f{i}(Xi). Should handle Xi of size(X{i}).
 %
-%     STEPSIZES  tA, tX, tb:  cell array of function handles.
+%         prox:  function handle.
+%           A function handle of the form
+%               @ (Xi, t) [size(Xi) DOUBLE]
+%           that evaluates prox^f{i}_t(Xi). Should handle Xi of size(X{i}).
+%
+%
+%     STEPSIZES  tA, tX, tb:  cell array of fun. handles for each variable.
 %       tA must have the same number of cells as A, etc. Each cell should 
 %       be a function handle of the form  
-%           @ (cache, A, X, b) [DOUBLE > 0]
-%       that returns the stepsize. Here CACHE is the iPALM cache.
+%           @ (A, X, b, cache) [DOUBLE > 0]
+%       that returns the stepsize.
+%
 %
 %     MOMENTUM TERM  alph:  double in (0,1).
+%
+%
+%   Finally,the iPALM CACHE appears inv various functions (gradient and 
+%   stepsize) to speed up compute.
 %
 
 properties

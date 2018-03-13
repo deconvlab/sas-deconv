@@ -7,24 +7,30 @@ addpath('helpers');
 %% Generate some synthetic data, activation map values are {0,1}.
 [A0, X0, Y] = genconvdata(struct('K', 2));
 
-eta = 5e-2;        % Add some noise
-b0 = 1*rand;       % Add a random constant bias
+% Mess up the data a little
+eta = 5e-2;                             % Add some noise
+b0 = 1*rand(size(Y));                   % Add a random constant bias
 
-Y{1} = Y{1} + b0 + eta * randn(size(Y{1}));
+for i = 1:numel(Y)
+    Y{i} = Y{i} + b0(i) + eta * randn(size(Y{i}));
+end
 
 
 %% Set up parameters for iPALM iterations to solve CDL problem. 
-p = size(A0{1});    % Choose a recovery window size
-K = numel(A0);      % Choose # of atoms to recover
-lambda1 = 0.1;      % Sparsity regularization parameter
+% Initial solve
+p = size(A0{1});                        % Choose a recovery window size
+K = numel(A0);                          % Choose # of atoms to recover
+lambda1 = 0.1;                          % Sparsity regularization parameter
 
-xpos = true;        % Recover a nonnegative activation map
-getbias = true;     % Recover a constant bias
+xpos = true;                            % Recover a nonnegative activation map
+getbias = true;                         % Recover a constant bias
 
+% Reweighting
 reweights = 5;                          % number of reweights
 lambda2 = 1e-2;                         % lambda for reweighting
 eps = 1e-2;                             % reweighting param
 
+% Iterations and updates
 maxit = 1e2 * ones(reweights+1,1);      % iterations per reweighting loop
 maxit(1) = 2e3;                         % iterations in initial iPALM solve
 
