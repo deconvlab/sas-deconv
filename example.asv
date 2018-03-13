@@ -89,19 +89,10 @@ for r = 1:reweights+1
             for k = 1:K
                 subplot(2,2*K,2*K*(r>1) + 2*k-1); 
                 imagesc(abs(solver.A{k}));
-                xlabel(['Kernel ' num2str(k)]);
                 
-                if k == 1
-                    if r == 1
-                        ylabel('Before reweighting');
-                    else
-                        ylabel('After reweighting');
-                    end
-                end
                 
                 subplot(2,2*K,2*K*(r>1) + 2*k);
                 imagesc(solver.X{k});
-                xlabel(['Activation ' num2str(k)]);
             end
             subplot(2,2*K,2*K*(r>1)+1); title(tmp);
             drawnow;

@@ -33,6 +33,6 @@ The [iPALM method](https://arxiv.org/abs/1702.02505) is an accelerated first-ord
 
 # Expected updates
 
-- An ADMM iterator is expected soon.
+- An ADMM iterator may be added in the future.
 
 - Reimplement wrappers of SBD, CDL, etc. as classes? To add various associated methods such as synthesis.
