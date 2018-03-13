@@ -12,7 +12,7 @@ The [iPALM method](https://arxiv.org/abs/1702.02505) is an accelerated first-ord
 - Improved usability + commenting for core scripts:
     * `ipalm.m`, `mksbd.m`,  `mkcdl.m`, `genconvdata.m`
 
-- `example.m` updated
+- `example.m` updated. Comments + centering fixed.
 
 
 **2018-03-08**:
