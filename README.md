@@ -8,7 +8,7 @@ Please contact [yl3027@columbia.edu](yl3027@columbia.edu) for any requests / fee
 
 
 ## Last update for v2
-See [](UPDATES.md) for complete list.
+See [UPDATES.md](UPDATES.md) for complete list.
 
 **2018-03-16**
 - Some modifications to make SBD-iPALM more useful as a standalone package
