@@ -9,9 +9,26 @@ Please contact [yl3027@columbia.edu](yl3027@columbia.edu) for any requests / fee
 
 ## Updates for v2
 
+**2018-03-16**
+- Some modifications to make SBD-iPALM more useful as a standalone package
+
+    * `initpkg.m`: adds all utilities / scripts to the MATLAB path
+
+    * Some default iteration loops and updates are provided as seperate scripts
+
+        * `reweight_loop.m`:  default looping of iterations with reweighting
+
+        * `text_update.m`:  default update text print
+
+        * `cdl_update.m`:  default SBD / CDL centering, plots, update text
+
+    * Fixed centering for general CDL problems.
+
+
 **2018-03-13 (First batch of GitHub commits `GitHub1`)**:
 
 - Improved usability + commenting for core scripts:
+
     * `ipalm.m`, `mksbd.m`,  `mkcdl.m`, `genconvdata.m`
 
 - `example.m` updated. Comments + centering fixed.

@@ -57,7 +57,6 @@ if nargin >= 1 && isstruct(params_in)
 end
 
 %% Generate data
-addpath('helpers');
 ob = obops;
 
 assert(p < m, 'Kernel size should be small compared to observation.');

@@ -1,0 +1,3 @@
+%% TEXT_UPDATE  Default update printout for the reweight loop
+fprintf('Iter. %d:%d.  Cost %.4e. Elapsed time %.2fs.\n', ...
+    rwgt-1, solver.it, solver.cost, toc(stime));
