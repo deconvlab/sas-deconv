@@ -8,7 +8,6 @@ Please contact [yl3027@columbia.edu](yl3027@columbia.edu) for any requests / fee
 
 
 ## Last update for v2
-See [UPDATES.md](UPDATES.md) for complete list.
 
 **2018-03-16**
 - Some modifications to make SBD-iPALM more useful as a standalone package
@@ -25,9 +24,10 @@ See [UPDATES.md](UPDATES.md) for complete list.
 
     * Fixed centering for general CDL problems.
 
+See [UPDATES.md](UPDATES.md) for complete list.
 
 
-# Expected additions
+## Expected additions
 
 - An ADMM iterator may be added in the future.
 
