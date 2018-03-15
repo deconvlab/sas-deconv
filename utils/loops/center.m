@@ -26,9 +26,9 @@ for k = 1:numel(A)
         A_{k} = A_{k}/norm(A_{k},'fro');
     end
     for n = 1:size(X,2)
-        X{k,l} = circshift(X{k,l},-[i j]);
+        X{k,n} = circshift(X{k,n},-[i j]);
 
-        if ~isempty(X_);  X_{k,l} = circshift(X_{k,l},[i j]);  end
+        if ~isempty(X_);  X_{k,n} = circshift(X_{k,n},[i j]);  end
     end
 end
 end
