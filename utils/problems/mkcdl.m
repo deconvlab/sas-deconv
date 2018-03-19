@@ -68,7 +68,7 @@ if nargin < 4 || isempty(invfft);   invfft = true;     end
 
 Yest = cell(1, N);
 for n = 1:N
-    m = size(X{1, N});
+    m = size(X{1, n});
     tmp = zeros(m);  tmp(1) = tmp(1) + prod(m) * b{n};
     for k = 1:K
         tmp = tmp + fft2(A{k}, m(1), m(2)) .* fft2(X{k, n});

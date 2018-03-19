@@ -52,12 +52,9 @@ end
 solvers = cell(reweights+1,1);
 costs = cell(reweights+1,1);  
 stime = tic;  
-title('Original observation');
 for rwgt = 1:reweights+1
     if rwgt > 1
         solver = reweight(solver, lambda2, eps);
-    else
-        figure(2); clf;
     end
     costs{rwgt} = NaN(maxit(rwgt),1);
     

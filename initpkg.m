@@ -12,6 +12,7 @@ function initpkg(rm)
 
 % Directories + subdirectories to add to path
 dirs = {
+    '.'
     'utils'
 };
 

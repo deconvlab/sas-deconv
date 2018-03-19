@@ -34,7 +34,7 @@ end
 function [out] = dist(A, B)
 out = 0;
 for i = 1:size(A,3)
-   out = out + acos(inner(A(:,:,i), B(:,:,i)))^2;
+   out = out + real(acos(inner(A(:,:,i), B(:,:,i))))^2;
 end
 out = sqrt(out);
 end
