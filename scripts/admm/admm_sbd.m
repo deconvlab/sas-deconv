@@ -27,7 +27,7 @@ function o = admm_sbd(Y, p, reg)
     tmp = {mod(tmp(1)+(1:p(1)), m(1))+1 mod(tmp(2)+(1:p(2)), m(1))+1};
     
     o.A = Y(tmp{1}, tmp{2});
-    %o.A = randn(p);
+    o.A = randn(p);
     o.A = o.A/norm(o.A,'fro');
     o.A_ = fft2(o.A, m(1), m(2));
     o.WA_ = zeros(m);
@@ -60,6 +60,7 @@ function o = iterate(o)
     %o.X = o.rhoX * o.reg.prox(ifftX_ + o.WX/o.rhoX, o.rhoX);
     o.X = ifftX_ + o.WX/o.rhoX;
     o.X = sign(o.X) .* max(abs(o.X) - o.reg.weights/o.rhoX, 0);
+    if o.reg.xpos;  o.X = max(o.X, 0);  end
     
     % A_ subproblem
     o.A_ = o.rhoA * fft2(o.A, m(1), m(2)) - o.WA_ + conj(o.X_) .* tmp;

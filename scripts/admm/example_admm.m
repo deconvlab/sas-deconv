@@ -37,15 +37,15 @@ for i = 1:maxit
     if mod(i, update) == 0 
         figure(1);
         
-        subplot(321); imagesc(Y);
+        subplot(231); imagesc(Y);
         title(['Iteration ' num2str(solver.it)]);
-        subplot(322); imagesc(cconvfft2(solver.A, solver.X));
+        subplot(234); imagesc(cconvfft2(solver.A, solver.X));
 
-        subplot(323); imagesc(A0);
-        subplot(324); imagesc(solver.A);
+        subplot(232); imagesc(A0);
+        subplot(235); imagesc(solver.A);
 
-        subplot(325); imagesc(X0);
-        subplot(326); imagesc(solver.X);
+        subplot(233); imagesc(X0);
+        subplot(236); imagesc(solver.X);
         
         drawnow;
     end
