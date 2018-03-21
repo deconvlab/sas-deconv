@@ -88,7 +88,7 @@ end
 
 properties (Access = private)
     A0;  X0;  b0;       % fixed initializations
-    ob = obops;         % operations on the oblique manifold
+    s = sphereops;      % operations on the sphere
     cache = struct;
 end
 
@@ -162,12 +162,12 @@ function o = iterate(o)  %#ok<*NASGU>
         % Riemmanian steps with momentum over A(:,i)
         for j = 1:size(o.A, 1)
             w = o.A;  
-            w{j,i} = o.ob.Exp(w{j,i}, o.alph*o.ob.Log(o.A_{j,i}, w{j,i}));
+            w{j,i} = o.s.Exp(w{j,i}, o.alph*o.s.Log(o.A_{j,i}, w{j,i}));
             [g, c] = o.H.gradA{j,i}(w, o.X, o.b, c);
             [t, c] = o.tA{j,i}(w, o.X, o.b, c);
 
             o.A_{j,i} = o.A{j,i};
-            o.A{j,i} = o.ob.Exp(w{j,i}, -t*g);
+            o.A{j,i} = o.s.Exp(w{j,i}, -t*g);
             
             if o.info.debug
                 o.info.gradA{j,i} = g;
