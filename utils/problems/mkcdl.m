@@ -63,8 +63,9 @@ end
 
 
 function Yest = synthfun(A, X, b, invfft)
-if nargin < 4 || isempty(invfft);   invfft = true;     end
 [K, N] = size(X);
+if nargin < 3 || isempty(b);   afun(@(i) 0, {ones(1,N)});     end
+if nargin < 4 || isempty(invfft);   invfft = true;     end
 
 Yest = cell(1, N);
 for n = 1:N

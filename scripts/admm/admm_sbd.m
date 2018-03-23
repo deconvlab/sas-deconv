@@ -4,9 +4,9 @@ properties
     A_; X_; Z_;             % slack variables
     WA_; WX; WZ_;           % multipliers
     
-    rhoA = [1e2 500 2];  
-    rhoX = [1e2 500 1.2];
-    rhoZ = [1e1 0 1];
+    rhoA = [20 500 2];  
+    rhoX = [20 500 1.2];
+    rhoZ = [1 0 1];
     rhomax = 1e4;
     
     reg;                    % regularizer
@@ -38,11 +38,11 @@ function o = admm_sbd(Y, p, reg, Ainit)
     o.A_ = fft2(o.A, m(1), m(2));
     o.WA_ = zeros(m);
     
-    o.X = ones(m);
+    o.X = zeros(m);
     o.X_ = fft2(o.X);
     o.WX = zeros(m);
     
-    o.b = 0;
+    o.b = median(Y(:));
     
     o.Z_ = zeros(m);
     o.WZ_ = zeros(m);

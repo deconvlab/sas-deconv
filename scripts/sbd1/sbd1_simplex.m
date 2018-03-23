@@ -6,10 +6,10 @@ addpath('../admm');
 %% Problem setup
 clf; hold off; drawnow;
 
-%a0 = [-.4 -.4 0];  a0 = a0/norm(a0);
-a0 = [-.4 -.4 0];  a0(3) = sqrt(max(1-sum(a0.^2), 0));
+p = 32;
+a0 = randn(p,1);  a0 = a0/norm(a0);
 
-m = 1024;                        % Observation size
+m = 1024;                       % Observation size
 theta = 2e-1;                   % Bernoulli (sparsity) coefficient
 dist = @(m,n) randn(m,n);       % Distribution of activations
 x0 = (rand(m,1) <= theta) .* dist(m,1);
@@ -18,22 +18,36 @@ y = cconv(a0, x0, m);
 
 lambda = 0.1;
 
-% Plot phi over the hemisphere
-samples = sample_hemi3(40,200);
 
-costs = repmat({NaN(1,size(samples,2))}, [size(samples,1) 1]);
-parfor i = 1:size(samples,1)
+% Plot phi over the simplex
+s = 4;  s = -ceil(p/s):ceil(p/s);
+s = s(randperm(numel(s), 3));
+s = [0 s(s~=0)];  s = s(1:3);
+
+nsamps = 1e2;
+samples = linspace(-1,1.5, nsamps);
+
+a1 = [a0; zeros(m-p,1)];
+a2 = circshift(a1, s(3));  a2 = a2(1:p);  a2 = a2/norm(a2);
+a1 = circshift(a1, s(2));  a1 = a1(1:p);  a1 = a1/norm(a1);
+costs = repmat({NaN(1,nsamps)}, [nsamps 1]);
+parfor u = 1:nsamps
     phi = phi_fista(huber(lambda));
-    for a = 1:size(samples,2)
-        [phi, costs{i}(a)] = evaluate(phi, y, samples(i,a,:));
+    for v = 1:nsamps
+        a = a0 + samples(u)*(a1-a0) + samples(v)*(a2-a0); %#ok<PFBNS>
+        a = a/norm(a);
+        [phi, costs{u}(v)] = evaluate(phi, y, a);
     end
 end
 costs = cell2mat(costs);
 
-surf(samples(:,:,1), samples(:,:,2), costs);  hold on;  colormap jet
-contour(samples(:,:,1), samples(:,:,2), costs);  colormap jet
-shading interp;  view(2);
-xlabel('x');  ylabel('y');
+surf(samples, samples, costs);  hold on;  colormap parula
+shading interp;  view(2);  drawnow;
+xlabel('u');  ylabel('v');
+
+contour(samples, samples, costs);  colormap parula
+plot([0 1; 0 0; 0 1]', [0 0; 0 1; 1 0]', 'k', 'LineWidth', 1.2);
+plot(1/3, 1/3, 'o');
 
 %% Plot trajectories over hemisphere
 maxit = 300;
