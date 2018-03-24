@@ -1,5 +1,4 @@
 %% Plot phi
-clf; hold off;
 surf(gsamps, gsamps, phi_g);  hold on;  
 colormap parula;  shading interp;  
 

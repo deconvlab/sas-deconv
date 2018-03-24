@@ -50,7 +50,9 @@ phidelta = 8 - min(phi_g(:));
 phi_g = phi_g + phidelta;
 
 % Plot phi surface
-plotcontour = true; surf_simplex; %#ok<*NASGU>
+plotcontour = true; %#ok<*NASGU>
+clf; hold off;
+surf_simplex; 
 
 %% Trajectories over hemisphere
 maxit = 500;
@@ -92,43 +94,42 @@ parfor j = 1:numel(solvers)
 end
 
 %% Plotting
-plotcontour = true;
-clf; surf_simplex;
+plotcontour = true; clf; hold off;
 
 lgd = {'PALM', 'iPALM', 'ADMM'};
-colors = [0 0.6 0; 1 0 1; 1 .5 .3];
+colors = [0 0.5 0; 1 0 1; 1 .5 .3];
 sym = {'x', 'o', '^'};
-pit = maxit*0.7;
+pit = ceil(maxit*0.7);
+pidxs = 1:20:pit+1;
+
+if plotcontour
+for j = 1:numel(solvers)
+    colormapline(...
+        xypath{j}(1,1:pit), xypath{j}(2,1:pit), costs{j}(1:pit)+phidelta+1, ...
+        min(log10(linspace(1,10,pit)),1)'*colors(j,:));  hold on; 
+    
+    plot3(...
+        xypath{j}(1,pidxs), xypath{j}(2,pidxs), costs{j}(pidxs)+phidelta+1, ...
+        sym{j}, 'LineWidth', 1, 'Color', colors(j,:)); %#ok<*UNRCH>
+end
+end
 
 h = cell(1,2);
 for j = 1:numel(solvers)
-    if plotcontour
-        colormapline(...
-            xypath{j}(1,1:pit), xypath{j}(2,1:pit), costs{j}(1:pit)+phidelta+1, ...
-            min(log10(linspace(1,10,pit)),1)'*colors(j,:));
-    end
-    
-
     h{1} = [h{1}, colormapline(...
         xypath{j}(1,1:pit), xypath{j}(2,1:pit), [], ...
         min(log10(linspace(1,10,pit)),1)'*colors(j,:) ...
+    )];  hold on; 
+    
+    h{2} = [h{2}, plot(xypath{j}(1,pidxs), xypath{j}(2,pidxs), ...
+        sym{j}, 'LineWidth', 1, 'Color', colors(j,:) ...
     )];
 end
 
-i = 1:20:pit+1;
-for j = 1:numel(solvers)
-    if plotcontour
-        plot3(...
-            xypath{j}(1,i), xypath{j}(2,i), costs{j}(i)+phidelta+1, ...
-            sym{j}, 'LineWidth', 1, 'Color', colors(j,:)); %#ok<*UNRCH>
-    end
-
-    
-    h{2} = [h{2}, plot(xypath{j}(1,i), xypath{j}(2,i), ...
-        sym{j}, 'LineWidth', 1, 'Color', colors(j,:) ...
-    )]; ...
-end
+surf_simplex;
 
 legend(h{2}, lgd(1:numel(solvers)));
+
 xlim([gsamps(1) gsamps(end)]);  
 ylim([gsamps(1) gsamps(end)]);
+
