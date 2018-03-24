@@ -4,8 +4,6 @@ addpath('colormapline');
 addpath('../admm');
 
 %% Problem setup
-clf; hold off; drawnow;
-
 p = 32;
 a0 = randn(p,1);  a0 = a0/norm(a0);
 
@@ -18,45 +16,65 @@ y = cconv(a0, x0, m);
 
 lambda = 0.1;
 
+%% Calculate phi over the simplex
+gsamps = linspace(-0.25,1.25, 1e2);        % coordinates on grid space
 
-% Plot phi over the simplex
+% Transformation from shift space to grid space -- x = Cu + d
+C = [-.5 .5; -sqrt(3)/2 -sqrt(3)/2];
+Cinv = inv(C);
+d = [0.5; 0.5 + sqrt(3)/4];
+
+% Shifts
 s = 4;  s = -ceil(p/s):ceil(p/s);
 s = s(randperm(numel(s), 3));
 s = [0 s(s~=0)];  s = s(1:3);
 
-nsamps = 1e2;
-samples = linspace(-1,1.5, nsamps);
+u = [a0; zeros(m-p,1)];
+v = circshift(u, s(3));  v = v(1:p);  v = v/norm(v) - a0;
+u = circshift(u, s(2));  u = u(1:p);  u = u/norm(u) - a0;
 
-a1 = [a0; zeros(m-p,1)];
-a2 = circshift(a1, s(3));  a2 = a2(1:p);  a2 = a2/norm(a2);
-a1 = circshift(a1, s(2));  a1 = a1(1:p);  a1 = a1/norm(a1);
-costs = repmat({NaN(1,nsamps)}, [nsamps 1]);
-parfor u = 1:nsamps
+phi_g = repmat({NaN(numel(gsamps),1)}, [1 numel(gsamps)]);
+parfor i = 1:numel(gsamps)
     phi = phi_fista(huber(lambda));
-    for v = 1:nsamps
-        a = a0 + samples(u)*(a1-a0) + samples(v)*(a2-a0); %#ok<PFBNS>
+    for j = 1:numel(gsamps)
+        uv = Cinv*([gsamps(i); gsamps(j)] - d); %#ok<MINV>
+        
+        a = a0 + uv(1)*u + uv(2)*v; 
         a = a/norm(a);
-        [phi, costs{u}(v)] = evaluate(phi, y, a);
+        [phi, phi_g{i}(j)] = evaluate(phi, y, a);
     end
 end
-costs = cell2mat(costs);
+phi_g = cell2mat(phi_g);
+phidelta = 8 - min(phi_g(:));
+phi_g = phi_g + phidelta;
 
-surf(samples, samples, costs);  hold on;  colormap parula
-shading interp;  view(2);  drawnow;
-xlabel('u');  ylabel('v');
+%% Plot phi
+clf; hold off;
+surf(gsamps, gsamps, phi_g);  hold on;  colormap parula
+shading interp;  view(3);  drawnow;
+xlabel('g_1');  ylabel('g_2');
 
-contour(samples, samples, costs);  colormap parula
-plot([0 1; 0 0; 0 1]', [0 0; 0 1; 1 0]', 'k', 'LineWidth', 1.2);
-plot(1/3, 1/3, 'o');
+contour(gsamps, gsamps, phi_g);  colormap parula
+
+a = [d C(:,1)+d C(:,2)+d d];    % show the simplex
+plot(a(1,:), a(2,:), 'k', 'LineWidth', 1);
+plot(a(1,:), a(2,:), 'ro', 'LineWidth', 1.2, 'MarkerSize', 7);
+
+for i = 1:3
+    text(a(1,i), a(2,i), sprintf('  S_{%d}[a0]', s(i)));
+end
+
+a = C*[1 1]'/3 + d;             % middle point
+plot(a(1), a(2), 'bx', 'LineWidth', 1.2, 'MarkerSize', 7);
+text(a(1), a(2), '  center');
 
 %% Plot trajectories over hemisphere
-maxit = 300;
+maxit = 500;
 
 % Fix initial point
-%a = [0.46 -0.68];
-%a = [-.69 .054];
-a = [.55 .5];
-a(3) = sqrt(max(1-sum(a.^2),0));
+uv = [1; 1]/3;
+a = a0 + uv(1)*u + uv(2)*v; 
+a = a/norm(a);
 
 solvers = {
     sbd1_ipalm(y, 3, lambda, false, false, a) ...
@@ -72,17 +90,24 @@ solvers{3}.rhoZ = [1 0 1]
 phi = arrayfun(@(~) evaluate(phi_fista(huber(lambda)), y, a), ...
     1:numel(solvers), 'UniformOutput', false);
 
-samples = repmat({[a; NaN(maxit,3)]}, [1 numel(solvers)]);
-costs = repmat({[phi{1}.costs(end); NaN(maxit,1)]}, [1 numel(solvers)]);
-for i = 2:maxit+1
-    for j = 1:numel(solvers)
+xypath = repmat({[C*uv + d NaN(2,maxit)]}, [numel(solvers) 1]);
+costs = repmat({[phi{1}.costs(end) NaN(1, maxit)]}, [numel(solvers) 1]);
+%debug = repmat({NaN(2, maxit)}, [numel(solvers) 1]);
+parfor j = 1:numel(solvers)
+    for i = 2:maxit+1
         solvers{j} = iterate(solvers{j});
-        samples{j}(i,:) = solvers{j}.A;
-        [phi{j}, costs{j}(i)] = evaluate(phi{j}, y, solvers{j}.A);
+        uv = -[u v -solvers{j}.A]\a0;  uv = uv(1:2);
+        
+        xypath{j}(:,i) = C*uv + d;
+        
+        a = [u v]*uv + a0;  a = a/norm(a);
+        [phi{j}, costs{j}(i)] = evaluate(phi{j}, y, a);
+        
+        %debug{j}(:,i-1) = [norm(a) dot(a,solvers{j}.A)];
     end
 end
 
-% Plotting
+%% Plotting
 lgd = {'PALM', 'iPALM', 'ADMM'};
 colors = [0 1 0; 1 0 1; 1 .5 .3];
 sym = {'x', 'o', '^'};
@@ -90,22 +115,22 @@ sym = {'x', 'o', '^'};
 h = cell(1,2);
 for j = 1:numel(solvers)
     h{1} = [h{1}, colormapline(...
-        samples{j}(:,1), samples{j}(:,2), costs{j}+1, ...
+        xypath{j}(1,:), xypath{j}(2,:), costs{j}+phidelta+1, ...
         min(log10(linspace(1,10,maxit)),1)'*colors(j,:) ...
     )];
 
-    colormapline(samples{j}(:,1), samples{j}(:,2), [], ...
+    colormapline(xypath{j}(1,:), xypath{j}(2,:), [], ...
         min(log10(linspace(1,10,maxit)),1)'*colors(j,:));
 end
 
-i = 1:10:maxit+1;
+i = 1:20:maxit+1;
 for j = 1:numel(solvers)
     h{2} = [h{2}, plot3(...
-        samples{j}(i,1), samples{j}(i,2), costs{j}(i)+1, ...
+        xypath{j}(1,i), xypath{j}(2,i), costs{j}(i)+phidelta+1, ...
         sym{j}, 'LineWidth', 1, 'Color', colors(j,:) ...
     )];
 
-    plot(samples{j}(i,1), samples{j}(i,2), ...
+    plot(xypath{j}(1,i), xypath{j}(2,i), ...
         sym{j}, 'LineWidth', 1, 'Color', colors(j,:));
 end
 
