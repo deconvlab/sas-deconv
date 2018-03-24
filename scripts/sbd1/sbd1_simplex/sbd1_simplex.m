@@ -1,6 +1,6 @@
 clc; clear; %#ok<*NOPTS>
 run('../../../initpkg.m');
-addpath('colormapline');
+addpath('../colormapline');
 addpath('../../admm');
 addpath('../');
 
@@ -46,7 +46,7 @@ parfor i = 1:numel(gsamps)
     end
 end
 phi_g = cell2mat(phi_g);
-phidelta = 8 - min(phi_g(:));
+phidelta = 10 - min(phi_g(:));
 phi_g = phi_g + phidelta;
 
 % Plot phi surface
@@ -55,7 +55,7 @@ clf; hold off;
 surf_simplex; 
 
 %% Trajectories over hemisphere
-maxit = 500;
+maxit = 1000;
 
 % Fix initial point
 uv = [1; 1]/3;
@@ -69,14 +69,15 @@ solvers = {
 
 solvers{1}.iterator.alph = 0;
 solvers{2}.iterator.alph = 0.9;
-solvers{3}.rhoA = [1 30 2];
-solvers{3}.rhoX = [1 30 2];
+solvers{3}.rhoA = [1 80 2];
+solvers{3}.rhoX = [1 80 2];
 solvers{3}.rhoZ = [1 0 1]
 
 phi = arrayfun(@(~) evaluate(phi_fista(huber(lambda)), y, a), ...
     1:numel(solvers), 'UniformOutput', false);
 
 xypath = repmat({[C*uv + d NaN(2,maxit)]}, [numel(solvers) 1]);
+uvpath = repmat({[uv NaN(2,maxit)]}, [numel(solvers) 1]);
 costs = repmat({[phi{1}.costs(end) NaN(1, maxit)]}, [numel(solvers) 1]);
 %debug = repmat({NaN(2, maxit)}, [numel(solvers) 1]);
 parfor j = 1:numel(solvers)
@@ -84,6 +85,7 @@ parfor j = 1:numel(solvers)
         solvers{j} = iterate(solvers{j});
         uv = -[u v -solvers{j}.A]\a0;  uv = uv(1:2);
         
+        uvpath{j}(:,i) = uv;
         xypath{j}(:,i) = C*uv + d;
         
         a = [u v]*uv + a0;  a = a/norm(a);
@@ -99,14 +101,14 @@ plotcontour = true; clf; hold off;
 lgd = {'PALM', 'iPALM', 'ADMM'};
 colors = [0 0.5 0; 1 0 1; 1 .5 .3];
 sym = {'x', 'o', '^'};
-pit = ceil(maxit*0.7);
+pit = ceil(maxit);
 pidxs = 1:20:pit+1;
 
 if plotcontour
 for j = 1:numel(solvers)
     colormapline(...
         xypath{j}(1,1:pit), xypath{j}(2,1:pit), costs{j}(1:pit)+phidelta+1, ...
-        min(log10(linspace(1,10,pit)),1)'*colors(j,:));  hold on; 
+        exp(-linspace(0,5,pit))'*colors(j,:));  hold on; 
     
     plot3(...
         xypath{j}(1,pidxs), xypath{j}(2,pidxs), costs{j}(pidxs)+phidelta+1, ...
@@ -118,7 +120,7 @@ h = cell(1,2);
 for j = 1:numel(solvers)
     h{1} = [h{1}, colormapline(...
         xypath{j}(1,1:pit), xypath{j}(2,1:pit), [], ...
-        min(log10(linspace(1,10,pit)),1)'*colors(j,:) ...
+        exp(-linspace(0,5,pit))'*colors(j,:) ...
     )];  hold on; 
     
     h{2} = [h{2}, plot(xypath{j}(1,pidxs), xypath{j}(2,pidxs), ...
@@ -130,6 +132,6 @@ surf_simplex;
 
 legend(h{2}, lgd(1:numel(solvers)));
 
+view(180,-90);  
 xlim([gsamps(1) gsamps(end)]);  
 ylim([gsamps(1) gsamps(end)]);
-

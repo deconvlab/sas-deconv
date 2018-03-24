@@ -18,5 +18,5 @@ a = C*[1 1]'/3 + d;             % middle point
 plot(a(1), a(2), 'bx', 'LineWidth', 1.2, 'MarkerSize', 7);
 text(a(1), a(2), '  center');
 
-view(180,-90);  drawnow;
+drawnow;
 xlabel('g_1');  ylabel('g_2');
