@@ -55,7 +55,7 @@ clf; hold off;
 surf_simplex; 
 
 %% Trajectories over hemisphere
-maxit = 1000;
+maxit = 2e3;
 
 % Fix initial point
 uv = [1; 1]/3;
@@ -68,10 +68,12 @@ solvers = {
     admm_sbd(y(:), [3 1], huber(lambda), a(:)) };
 
 solvers{1}.iterator.alph = 0;
-solvers{2}.iterator.alph = 0.9;
+solvers{2}.iterator.alph = 0.99;
 solvers{3}.rhoA = [1 80 2];
 solvers{3}.rhoX = [1 80 2];
 solvers{3}.rhoZ = [1 0 1]
+
+solvers = solvers(1:2);
 
 phi = arrayfun(@(~) evaluate(phi_fista(huber(lambda)), y, a), ...
     1:numel(solvers), 'UniformOutput', false);
@@ -99,39 +101,44 @@ end
 plotcontour = true; clf; hold off;
 
 lgd = {'PALM', 'iPALM', 'ADMM'};
-colors = [0 0.5 0; 1 0 1; 1 .5 .3];
-sym = {'x', 'o', '^'};
-pit = ceil(maxit);
-pidxs = 1:20:pit+1;
+colors = [1 .4 .3; 1 0 1; 0 0.5 0];
+sym = {'s', 'd', '^'};
+pit = ceil(maxit*0.2);
+pidxs = 1:50:pit+1;
+%pidxs = round(linspace(1, pit+1, 10));
+
+h = [];
+for j = 1:numel(solvers)
+    plot3(xypath{j}(1,1:pit+1), xypath{j}(2,1:pit+1), ...
+        costs{j}(1:pit+1)+phidelta + 1 + 3*(j-1), ...
+        'LineWidth', 1.5, 'Color', colors(j,:)); hold on;
+    
+    h = [h, plot3(...
+        xypath{j}(1,pidxs), xypath{j}(2,pidxs), ...
+        costs{j}(pidxs)+phidelta + 1 + 3*(j-1), ...
+        sym{j}, 'MarkerSize', 10,...
+        'LineWidth', 1, 'Color', colors(j,:) ...
+        )]; %#ok<AGROW>
+end
 
 if plotcontour
 for j = 1:numel(solvers)
-    colormapline(...
-        xypath{j}(1,1:pit), xypath{j}(2,1:pit), costs{j}(1:pit)+phidelta+1, ...
-        exp(-linspace(0,5,pit))'*colors(j,:));  hold on; 
+    plot3(xypath{j}(1,1:pit+1), xypath{j}(2,1:pit+1), ...
+        zeros(pit+1,1) + 2*(j-1), ...
+        'LineWidth', 1.5, 'Color', colors(j,:));
     
-    plot3(...
-        xypath{j}(1,pidxs), xypath{j}(2,pidxs), costs{j}(pidxs)+phidelta+1, ...
-        sym{j}, 'LineWidth', 1, 'Color', colors(j,:)); %#ok<*UNRCH>
+    plot3(xypath{j}(1,pidxs), xypath{j}(2,pidxs), ...
+        zeros(size(pidxs)) + 2*(j-1), ...
+        sym{j}, 'MarkerSize', 10,...
+        'LineWidth', 1, 'Color', colors(j,:)); %#ok<*UNRCH>
 end
-end
-
-h = cell(1,2);
-for j = 1:numel(solvers)
-    h{1} = [h{1}, colormapline(...
-        xypath{j}(1,1:pit), xypath{j}(2,1:pit), [], ...
-        exp(-linspace(0,5,pit))'*colors(j,:) ...
-    )];  hold on; 
-    
-    h{2} = [h{2}, plot(xypath{j}(1,pidxs), xypath{j}(2,pidxs), ...
-        sym{j}, 'LineWidth', 1, 'Color', colors(j,:) ...
-    )];
 end
 
 surf_simplex;
 
-legend(h{2}, lgd(1:numel(solvers)));
+legend(h, lgd(1:numel(solvers)), 'Location', 'southwest');
 
-view(180,-90);  
+view(vw{:});
+%view(180,-90);  
 xlim([gsamps(1) gsamps(end)]);  
 ylim([gsamps(1) gsamps(end)]);
