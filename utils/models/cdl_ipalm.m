@@ -59,8 +59,11 @@ function o = cdl_ipalm(Y, p, K, lambda, xpos, getbias)
     H.gradb = afun(@(i) @(A, X, b, c) gradb(A, X, b, Y, i, getbias, c), {1:N});
     tb = afun(@(i) @(A,~,~,c) stepszb(A,[],[], Y, i, getbias, c), {1:N});
 
-    b0 = afun(@(i) median(Y{i}(:)), {1:N});
-
+    if getbias
+        b0 = afun(@(i) median(Y{i}(:)), {1:N});
+    else
+        b0 = afun(@(i) 0, {1:N});
+    end
 
     o = o@ipalm(H, f, A0, X0, b0, tA, tX, tb);
 end
@@ -72,9 +75,6 @@ if nargin < 2 || isempty(n)
     Yhat = synthfun(o.A, o.X, o.b);
 else
     Yhat = synthfun(o.A, o.X(:,n), o.b(n));
-end
-if numel(n) == 1
-    Yhat = Yhat{1};
 end
 end
 

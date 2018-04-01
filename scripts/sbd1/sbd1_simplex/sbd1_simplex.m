@@ -104,7 +104,7 @@ lgd = {'PALM', 'iPALM', 'ADMM'};
 colors = [1 .4 .3; 1 0 1; 0 0.5 0];
 sym = {'s', 'd', '^'};
 pit = ceil(maxit*0.2);
-pidxs = 1:50:pit+1;
+pidxs = 1:20:pit+1;
 %pidxs = round(linspace(1, pit+1, 10));
 
 h = [];
