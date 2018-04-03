@@ -42,11 +42,11 @@ updates = [ 1 10:10:50 ...              % when to print updates
 %% Initialize solver + run some iterations of iPALM
 
 % If K is set to 1, the SBD solver mksbd is more efficient
-[solver, synthesize] = mkcdl(Y, p, K, lambda1, xpos, getbias);     
+solver = cdl_ipalm(Y, p, K, lambda1, xpos, getbias);     
 
 update_script = 'cdl_update.m';
 figure(1);  subplot(3,2,[1 3]);  
-imagesc(abs(Y{1}-b0));
+imagesc(Y{1});
 title('Original Observation');
 
 figure(2); clf;

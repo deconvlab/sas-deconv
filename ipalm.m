@@ -79,7 +79,7 @@ properties
     A_;  X_;  b_;       % momentum terms
     
     tA; tX; tb;         % stepsizes
-    alph = 0.99;        % momentum parameter
+    alph = 0.99;        % momentum parameter [0, 0.5)
     
     cost;
     it = 0;

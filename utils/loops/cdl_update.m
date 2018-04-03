@@ -11,7 +11,7 @@ end
 
 figure(1);
 subplot(3,2,[2 4]); 
-imagesc(abs(synthesize(solver.A, solver.X, {0})));
+imagesc(reconstruct(solver));
 title('Reconstruction');
 
 subplot(313); 

@@ -38,7 +38,7 @@ function o = cdl_ipalm(Y, p, K, lambda, xpos, getbias)
         idx = randi(N);
         m = size(Y{idx});
         tmp = [randi(m(1)) randi(m(2))];
-        tmp = {mod(tmp(1)+(1:p(1)), m(1))+1 mod(tmp(2)+(1:p(2)), m(1))+1};
+        tmp = {mod(tmp(1)+(1:p(1)), m(1))+1 mod(tmp(2)+(1:p(2)), m(2))+1};
         A0{i} = ob.proj(Y{idx}(tmp{1}, tmp{2}));
     end
 
@@ -52,7 +52,7 @@ function o = cdl_ipalm(Y, p, K, lambda, xpos, getbias)
     tX = afun(@(k, n) @(A, X, b, c) stepszX(A, X, b, [k n], c), idx);
     f = afun(@(~) huber(lambda, xpos), idx(1));
 
-    X0 = repmat({ones(m)}, [K N]);
+    X0 = repmat(afun(@(Yi) zeros(size(Yi{:})), {Y}), [K 1]);
 
 
     % Set up b
