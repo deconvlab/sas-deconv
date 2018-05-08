@@ -167,7 +167,7 @@ function o = iterate(o)  %#ok<*NASGU>
             [t, c] = o.tA{j,i}(w, o.X, o.b, c);
 
             o.A_{j,i} = o.A{j,i};
-            o.A{j,i} = o.s.Exp(w{j,i}, -t*g);
+            o.A{j,i} = o.s.Exp(w{j,i}, -t*o.s.e2rgrad(w{j,i},g));
             
             if o.info.debug
                 o.info.gradA{j,i} = g;
