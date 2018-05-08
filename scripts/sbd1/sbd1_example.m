@@ -31,14 +31,15 @@ getbias = false;                % Recover a constant bias
 maxit = 2e2;                    % iterations in initial iPALM solve
 
 %% Initialize solver + run some iterations of iPALM
-solver = sbd1(y, p, lambda, xpos, getbias);
+solver = sbd1_ipalm(y, p, lambda, xpos, getbias);
 
 for i = 1:maxit
     solver = iterate(solver);
 end
 
 %% Plot results
-subplot(311); plot([y cconv(solver.A{:}, solver.X{:}, m)]); xlim([1 m]);
-subplot(312); plot([a0 solver.A{:}]); xlim([1 p]);
-subplot(313); stem([x0 solver.X{:}], '.'); xlim([1 m]);
+subplot(311); plot([y cconv(solver.A, solver.X, m)]); xlim([1 m]);
+subplot(312); plot([a0 solver.A]); xlim([1 p]);
+subplot(313); stem([x0 solver.X], '.'); xlim([1 m]);
+maxdotshift(solver.A, a0)
 

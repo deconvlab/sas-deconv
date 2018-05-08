@@ -1,7 +1,9 @@
 classdef sbd1_ipalm
 properties
-    A
-    X
+    a
+    x
+    cost
+    it
     iterator
 end
 methods
@@ -33,14 +35,30 @@ function o = sbd1_ipalm(y, p, lambda, xpos, getbias, a0)
 
     % Set up the object properties
     o.iterator = ipalm(H, f, {a0}, {rand(m,1)}, {b0}, tA, tX, tb);
-    o.A = o.iterator.A{1};
-    o.X = o.iterator.X{1};
+    o.a = o.iterator.A{1};
+    o.x = o.iterator.X{1};
 end
 
 function o = iterate(o)
     o.iterator = iterate(o.iterator);
-    o.A = o.iterator.A{1};
-    o.X = o.iterator.X{1};
+    o.a = o.iterator.A{1};
+    o.x = o.iterator.X{1};
+    o.cost = o.iterator.cost;
+    o.it = o.iterator.it;
+end
+
+function o = loop_phasetrans(o)
+    delta = 1e-3;
+    repeat = true;
+    prev_cost = Inf;
+    while repeat
+        o = iterate(o);
+
+        repeat = ...
+            (abs(prev_cost - o.cost) > delta) || ...
+            (o.iterator < 50);
+        prev_cost = o.cost;
+    end
 end
 end
 end
