@@ -7,7 +7,7 @@ The [iPALM method](https://arxiv.org/abs/1702.02505) is an accelerated first-ord
 Please contact [Yenson Lau](yl3027@columbia.edu) for any requests / feedback. We thank [Sky Chueng](physics.columbia.edu/people/profile/469), [John Shin](physics.columbia.edu/people/profile/938) and [Abhay Pasupathy](physics.columbia.edu/people/profile/428) for the simulated kernel data `Data_N_50_nDef_1_thop_-0.200.mat` used in `genconvdata.m` and `example.m`.
 
 
-## Last update for v2
+## Most recent update for v2
 
 **2018-03-16**
 - Some modifications to make SBD-iPALM more useful as a standalone package

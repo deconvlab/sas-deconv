@@ -1,5 +1,8 @@
 # Updates for v2
 
+**2018-06-15**
+- Final version of SBD-iPALM v2: starting v3, which will simplify `iPALM.m`
+
 **2018-03-16**
 - Some modifications to make SBD-iPALM more useful as a standalone package
 
