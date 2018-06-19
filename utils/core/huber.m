@@ -1,14 +1,10 @@
-classdef huber  %#ok<*PROPLC>
+classdef huber < handle & matlab.mixin.SetGet & matlab.mixin.Copyable %#ok<*PROPLC>
 %HUBER  Huber function
 
 properties
-  weights = 1;      % e.g. lambda, or array for reweighting.
-  mu = 1e-12;
-  xpos = false;
-  
-  value;
-  prox;
-  diffsubg;
+    weights = 1;      % e.g. lambda, or array for reweighting.
+    mu = 1e-12;
+    xpos = false;
 end
 
 methods
@@ -23,25 +19,14 @@ function obj = huber(weights, xpos, mu)
     if nargin >= 3 && ~isempty(mu)
         obj.mu = mu;
     end
-    
-    obj = compile_params(obj);
 end
 
-function obj = compile_params(obj)
-%COMPILE_PARAMS  Recreates the function handles to update parameters
-    assert(min(obj.weights(:)) >= 0, 'Weights must be nonnegative.');
-    
-    obj.value = @(x) value_(obj, x);
-    obj.prox = @(x, t) prox_(obj, x, t);
-    obj.diffsubg = @(x, y) diffsubg_(obj, x, y);
-end
-
-function [ hx ] = value_(obj, x)
+function hx = value(obj, x)
 %VALUE_  Get value for Huber function
-    mu = obj.mu; 
-        
+    mu = obj.mu;
+
     if obj.xpos && min(x(:)) < 0
-        hx = Inf;  
+        hx = Inf;
     else
         leq = abs(x(:)) <= mu;
         tmp = NaN(numel(x),1);
@@ -51,17 +36,29 @@ function [ hx ] = value_(obj, x)
     end
 end
 
-function [ proxh ] = prox_(obj, x, t)
+function proxh = prox(obj, x, t)
 %PROX_  Compute proximal mapping for Huber function
     w_t = obj.weights/t;
     if isscalar(w_t);  w_t = w_t * ones(size(x));  end
-    
+
     leq = abs(x) <= w_t + obj.mu;
     proxh = zeros(size(x));
     proxh(leq) = x(leq)./(1+w_t(leq)/obj.mu);
     proxh(~leq) = x(~leq) - w_t(~leq).*sign(x(~leq));
 
     if obj.xpos;  proxh = max(proxh,0);  end
+end
+end
+end
+
+%{
+function obj = compile_params(obj)
+%COMPILE_PARAMS  Recreates the function handles to update parameters
+    assert(min(obj.weights(:)) >= 0, 'Weights must be nonnegative.');
+
+    obj.value = @(x) value_(obj, x);
+    obj.prox = @(x, t) prox_(obj, x, t);
+    obj.diffsubg = @(x, y) diffsubg_(obj, x, y);
 end
 
 function [ eps ] = diffsubg_(obj, x, y)
@@ -79,6 +76,4 @@ function [ eps ] = diffsubg_(obj, x, y)
     if size(w) ~= size(x);  w = reshape(w, size(x));  end
     eps = y - w.*subg;
 end
-end
-end
-
+%}

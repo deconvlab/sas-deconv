@@ -8,21 +8,14 @@ Please contact [Yenson Lau](yl3027@columbia.edu) for any requests / feedback. We
 
 
 ## Most recent update for v2
+**2018-06-20**
+- Added `PDRegularizer` for regularizers of the form g(Dx)
 
-**2018-03-16**
-- Some modifications to make SBD-iPALM more useful as a standalone package
+    * comes with a Chambolle-Pock primal-dual method to solve for prox updates 
 
-    * `initpkg.m`: adds all utilities / scripts to the MATLAB path
+- A difference operator `imgdiff` for image deblurring: plug into D above. Improvements in progress.
 
-    * Some default iteration loops and updates are provided as seperate scripts
-
-        * `reweight_loop.m`:  default looping of iterations with reweighting
-
-        * `text_update.m`:  default update text print
-
-        * `cdl_update.m`:  default SBD / CDL centering, plots, update text
-
-    * Fixed centering for general CDL problems.
+- Numerous minor adjustments to clean up the code, which will continue to roll in the next few updates.
 
 See [UPDATES.md](UPDATES.md) for complete list.
 

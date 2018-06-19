@@ -4,7 +4,7 @@ properties
 end  
     
 methods
-function o = cdl_ipalm(Y, p, K, lambda, xpos, getbias)
+function o = cdl_ipalm(Y, p, K, regularizer, getbias)
 %CDL_IPALM Iterator for solving CDL
 %  Creates an iPALM iterator for solving CDL by supplying a smooth
 %  square-error term H, the nonsmooth Huber terms and the corresponding
@@ -20,8 +20,7 @@ function o = cdl_ipalm(Y, p, K, lambda, xpos, getbias)
 %       Y:  [1xN CELL].  A cell array containing the observation samples.
 %       p:  [2 INT].  The size of the recovered kernel.
 %       K:  [INT].  The number of kernels to recover.
-%       lambda:  [DOUBLE >0].  The sparsity tradeoff parameter.
-%       xpos:  bool.  Set to TRUE to ensure X is nonnegative.
+%       regularizer: a regularizer with VALUE and PROX methods.
 %       getbias: bool.  Set to TRUE to estimate a constant bias in each Y.
 %
 
@@ -50,7 +49,7 @@ function o = cdl_ipalm(Y, p, K, lambda, xpos, getbias)
     idx = {repmat((1:K)', [1 N])  repmat((1:N), [K 1])};
     H.gradX = afun(@(k, n) @(A, X, b, c) gradX(A, X, b, Y, [k n], c), idx);
     tX = afun(@(k, n) @(A, X, b, c) stepszX(A, X, b, [k n], c), idx);
-    f = afun(@(~) huber(lambda, xpos), idx(1));
+    f = afun(@(~) copy(regularizer), idx(1));
 
     X0 = repmat(afun(@(Yi) zeros(size(Yi{:})), {Y}), [K 1]);
 

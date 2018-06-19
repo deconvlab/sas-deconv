@@ -12,7 +12,6 @@ solver = reset(solver, solver.A, solver.X, solver.b);
 for i = 1:numel(solver.f)
     f = solver.f{i};
     f.weights = weighting(solver.X{i}); 
-    f = compile_params(f);
     solver.f{i} = f;
 end
 end

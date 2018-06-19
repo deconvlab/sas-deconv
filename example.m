@@ -34,22 +34,20 @@ maxit = 1e2 * ones(reweights+1,1);      % iterations per reweighting loop
 maxit(1) = 2e3;                         % iterations in initial iPALM solve
 
 centerfq = 5e2;                         % frequency to recenter the data
-updates = [ 1 10:10:50 ...              % when to print updates
-            100:100:500 ...
-            600:200:max(maxit)];
-
+updates = [ 1 10:10:max(maxit) ];       % when to print updates
 
 %% Initialize solver + run some iterations of iPALM
 
 % If K is set to 1, the SBD solver mksbd is more efficient
-solver = cdl_ipalm(Y, p, K, lambda1, xpos, getbias);     
+regularizer = huber(lambda1, xpos);
+regularizer = PDRegularizer(regularizer, [], 0.5, 1e-1, [0 Inf]);
+solver = cdl_ipalm(Y, p, K, regularizer, getbias);     
 
 update_script = 'cdl_update.m';
-figure(1);  subplot(3,2,[1 3]);  
+sfigure(1);  subplot(3,2,[1 3]);  
 imagesc(Y{1});
 title('Original Observation');
-
-figure(2); clf;
+sfigure(2);
 
 % Run iterations
 %profile on;

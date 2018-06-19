@@ -1,7 +1,13 @@
 # Updates for v2
 
-**2018-06-15**
-- Final version of SBD-iPALM v2: starting v3, which will simplify `iPALM.m`
+**2018-06-20**
+- Added `PDRegularizer` for regularizers of the form g(Dx)
+
+    * comes with a Chambolle-Pock primal-dual method to solve for prox updates 
+
+- A difference operator `imgdiff` for image deblurring: plug into D above. Improvements in progress.
+
+- Numerous minor adjustments to clean up the code, which will continue to roll in the next few updates.
 
 **2018-03-16**
 - Some modifications to make SBD-iPALM more useful as a standalone package
