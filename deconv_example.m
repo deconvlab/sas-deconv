@@ -44,10 +44,10 @@ regularizer = PDRegularizer(regularizer, [], 0.5, 1e-1, [0 Inf]);
 solver = cdl_ipalm(Y, p, K, regularizer, getbias);     
 
 update_script = 'cdl_update.m';
-sfigure(1);  subplot(3,2,[1 3]);  
+figure(1);  subplot(3,2,[1 3]);  
 imagesc(Y{1});
 title('Original Observation');
-sfigure(2);
+figure(2);
 
 % Run iterations
 %profile on;
